@@ -37,7 +37,7 @@ def init():
 # def 
 
 @main_bp.route('/products/list')
-# @login_required
+@login_required
 def product_list():
     # select amb join que retorna una llista dwe resultats
     products_with_category = db.session.query(Product, Category).join(Category).order_by(Product.id.asc()).all()
@@ -45,6 +45,7 @@ def product_list():
     return render_template('products/list.html', products_with_category = products_with_category)
 
 @main_bp.route('/products/create', methods = ['POST', 'GET'])
+@login_required
 def product_create(): 
 
     # select que retorna una llista de resultats
@@ -79,6 +80,7 @@ def product_create():
         return render_template('products/create.html', form = form)
 
 @main_bp.route('/products/read/<int:product_id>')
+@login_required
 def product_read(product_id):
     # select amb join i 1 resultat
     (product, category) = db.session.query(Product, Category).join(Category).filter(Product.id == product_id).one()
@@ -86,6 +88,7 @@ def product_read(product_id):
     return render_template('products/read.html', product = product, category = category)
 
 @main_bp.route('/products/update/<int:product_id>',methods = ['POST', 'GET'])
+@login_required
 def product_update(product_id):
     # select amb 1 resultat
     product = db.session.query(Product).filter(Product.id == product_id).one()
@@ -117,6 +120,7 @@ def product_update(product_id):
         return render_template('products/update.html', product_id = product_id, form = form)
 
 @main_bp.route('/products/delete/<int:product_id>',methods = ['GET', 'POST'])
+@login_required
 def product_delete(product_id):
     # select amb 1 resultat
     product = db.session.query(Product).filter(Product.id == product_id).one()
