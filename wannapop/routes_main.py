@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, redirect, url_for, flash
+from flask_login import current_user, login_required
 from .models import Product, Category
 from .forms import ProductForm, DeleteForm
 from werkzeug.utils import secure_filename
@@ -20,11 +21,23 @@ def handle_404(err):
 def handle_500(err):
     return render_template('500.html'), 500
 
+# @main_bp.route('/')
+# def init():
+#     return redirect(url_for('main_bp.product_list'))
+
 @main_bp.route('/')
 def init():
-    return redirect(url_for('main_bp.product_list'))
+    if current_user.is_authenticated:
+        return redirect(url_for('main_bp.product_list'))
+    else:
+        return redirect(url_for("auth_bp.login"))
+
+# login
+# @main_bp.route('/login')
+# def 
 
 @main_bp.route('/products/list')
+# @login_required
 def product_list():
     # select amb join que retorna una llista dwe resultats
     products_with_category = db.session.query(Product, Category).join(Category).order_by(Product.id.asc()).all()
