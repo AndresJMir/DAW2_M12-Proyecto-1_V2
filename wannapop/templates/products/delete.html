@@ -2,13 +2,13 @@
 {% from "_formhelpers.html" import render_errors %}
 {% block content %}
 
-<h3>Producte {{ product.id }}</h3>
-<ul>
-    <li>Nom: {{ product.title }}</li>
-    <li>Descripció: {{ product.description }}</li>
-    <li>Preu: {{ product.price }}</li>
-</ul>
-<p><img src="/static/products/{{ product.photo }}" alt="{{ product.title }}" /></p>
+<h3 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">Producte {{ product.id }}</h3>
+<ul class="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
+   <li class="text-gray-700 dark:text-gray-400">Nom: {{ product.title }}</li>
+   <li class="text-gray-700 dark:text-gray-400">Descripció: {{ product.description }}</li>
+   <li class="text-gray-700 dark:text-gray-400">Preu: {{ product.price }}</li>
+   <p><img src="/static/products/{{ product.photo }}" alt="{{ product.title }}" /></p>
+
 <p>Confirma que vols esborrar aquest product:</p>
 <form action="/products/delete/{{ product.id }}" method="POST">
     {{ form.csrf_token }}

@@ -1,17 +1,22 @@
 {% extends '_template.html' %}
 {% block content %}
 
-<h3>Producte {{ product.id }}</h3>
-<a href="/products/update/{{ product.id }}">Modificar producte</a>
-<br />
-<a href="/products/delete/{{ product.id }}">Esborrar producte</a>
-<ul>
-   <li>Nom: {{ product.title }}</li>
-   <li>Descripció: {{ product.description }}</li>
-   <li>Preu: {{ product.price }}</li>
-   <li>Categoria: {{ category.name }} </li>
-</ul>
-<p><img src="/static/products/{{ product.photo }}" alt="{{ product.title }}" /></p>
-<a href="/products/list">&#x3c;&#x3c; Tornar al llistat de productes</a>
+<h3 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">Producte {{ product.id }}</h3>
 
+<ul class="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
+   <li class="text-gray-700 dark:text-gray-400">Nom: {{ product.title }}</li>
+   <li class="text-gray-700 dark:text-gray-400">Descripció: {{ product.description }}</li>
+   <li class="text-gray-700 dark:text-gray-400">Preu: {{ product.price }}</li>
+   <li class="text-gray-700 dark:text-gray-400">Categoria: {{ category.name }} </li>
+   <p><img src="/static/products/{{ product.photo }}" alt="{{ product.title }}" /></p>
+
+   <h3 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">Acciones</h3>
+   <div class="flex flex-col flex-wrap mb-4 space-y-4 md:flex-row md:items-end md:space-x-4">
+      <a href="/products/update/{{ product.id }}" class="px-5 py-3 font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-lg active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">Modificar producte</a>
+      <br/>
+      <a href="/products/delete/{{ product.id }}" class="px-5 py-3 font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-lg active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">Esborrar producte</a>
+      <br />
+      <a href="/products/list" class="px-5 py-3 font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-lg active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">&#x3c;&#x3c; Tornar al llistat de productes</a>
+   </div>
+</ul>
 {% endblock %}

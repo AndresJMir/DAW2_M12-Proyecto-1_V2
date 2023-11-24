@@ -11,6 +11,15 @@ main_bp = Blueprint(
     "main_bp", __name__, template_folder="templates", static_folder="static"
 )
 
+# Error 404 y 500
+@main_bp.app_errorhandler(404)
+def handle_404(err):
+    return render_template('404.html'), 404
+
+@main_bp.app_errorhandler(500)
+def handle_500(err):
+    return render_template('500.html'), 500
+
 @main_bp.route('/')
 def init():
     return redirect(url_for('main_bp.product_list'))
