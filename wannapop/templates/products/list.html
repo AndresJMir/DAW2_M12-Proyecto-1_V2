@@ -1,28 +1,45 @@
-{% extends '_template.html' %}
+{% extends 'layouts/_base.html' %}
+
+{% block title %}
+Productes
+{% endblock %}
+
 {% block content %}
-
-<h3 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">Productes</h3>
-<!--Botonesssss-->
-<div class="flex flex-col flex-wrap mb-4 space-y-4 md:flex-row md:items-end md:space-x-4">
-<a href="/products/create" class="px-5 py-3 font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-lg active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">Crear un nou producte</a>
-</div>
-<h1 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">Listado:</h1>
-<table>
-	<tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
-		<th class="px-4 py-3">ID</th>
-		<th class="px-4 py-3">NOM</th>
-		<th class="px-4 py-3">PREU</th>
-		<th class="px-4 py-3">CATEGORIA</th>
-	</tr>
-
-	{% for (product, category) in products_with_category %}
-	<tr class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
-		<td class="text-gray-700 dark:text-gray-400"><a href="/products/read/{{ product.id }}">{{ product.id }}</a></td>
-		<td class="text-gray-700 dark:text-gray-400"><a href="/products/read/{{ product.id }}">{{ product.title }}</a></td>
-		<td class="text-gray-700 dark:text-gray-400"><a href="/products/read/{{ product.id }}">{{ product.price }}</a></td>
-		<td class="text-gray-700 dark:text-gray-400"><a href="/products/read/{{ product.id }}">{{ category.name }}</a></td>
-	</tr>
-	{% endfor %}
+<table class="table table-bordered table-striped" style="background-color: #fefefe;">
+	<thead>
+		<tr>
+			<th>ID</th>
+			<th>NOM</th>
+			<th>PREU</th>
+			<th>CATEGORIA</th>
+			<th colspan="3">Accions</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for (product, category) in products_with_category %}
+		<tr class="{{ 'own' if product.seller_id == current_user.id }}">
+			<td><a href="/products/read/{{ product.id }}" alt="Visualitzar">{{ product.id }}</a></td>
+			<td>{{ product.title }}</td>
+			<td>{{ product.price }}</td>
+			<td>{{ category.name }}</td>
+			<td>
+				<a href="/products/read/{{ product.id }}" alt="Visualitzar">👁️</a>
+			</td>
+			<td>
+				{% if current_user.is_action_allowed_to_product(Action.products_update, product) %}
+				<a href="/products/update/{{ product.id }}" alt="Editar">📝</a>
+				{% endif %}
+			</td>
+			<td>
+				{% if current_user.is_action_allowed_to_product(Action.products_delete, product) %}
+				<a href="/products/delete/{{ product.id }}" alt="Eliminar">❌</a>
+				{% endif %}
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
 </table>
-
+{% if current_user.is_action_allowed_to_product(Action.products_create) %}
+<a class="btn btn-secondary btn-xl" href="/products/create">Crear un nou producte</a>
+{% endif %}
 {% endblock %}
