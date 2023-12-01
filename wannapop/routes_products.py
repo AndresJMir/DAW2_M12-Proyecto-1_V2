@@ -8,6 +8,9 @@ from . import db_manager as db
 import uuid
 import os
 
+from . import db_manager as db, mail_manager as mail, logger
+
+
 # Blueprint
 products_bp = Blueprint("products_bp", __name__)
 
@@ -23,7 +26,8 @@ def templates_processor():
 def product_list():
     # select amb join que retorna una llista de resultats
     products_with_category = db.session.query(Product, Category).join(Category).order_by(Product.id.asc()).all()
-    
+    #Debug
+    logger.debug(f"products_with_category = {products_with_category}")
     return render_template('products/list.html', products_with_category = products_with_category)
 
 @products_bp.route('/products/create', methods = ['POST', 'GET'])

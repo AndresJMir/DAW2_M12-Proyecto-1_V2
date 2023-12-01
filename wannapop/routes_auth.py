@@ -1,6 +1,6 @@
 from flask import Blueprint, redirect, url_for, render_template, flash
 from flask_login import current_user, login_required, login_user, logout_user
-from . import db_manager as db, login_manager, mail_manager
+from . import db_manager as db, login_manager, mail_manager, logger
 from .forms import LoginForm, RegisterForm, ResendForm
 from .helper_role import notify_identity_changed, Role
 from .models import User
@@ -23,6 +23,7 @@ def login():
         user = load_user(email)
         if user and user.check_password(password):
             # si no està verificat, no pot entrar
+            
             if not user.verified:
                 flash("Revisa el teu email i verifica el teu compte", "error")
                 return redirect(url_for("auth_bp.login"))
@@ -31,8 +32,11 @@ def login():
             login_user(user)
             # aquí s'actualitzen els rols que té l'usuari
             notify_identity_changed()
+            logger.info(f"Usuari {email} s'ha autenticat correctament")
 
             return redirect(url_for("main_bp.init"))
+        else:
+            logger.warning(f"Usuari {email} no s'ha autenticat correctament")
 
         # si arriba aquí, és que no s'ha autenticat correctament
         flash("Error d'usuari i/o contrasenya", "error")
