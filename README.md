@@ -36,9 +36,15 @@ Crea un fitxer `.env` amb els paràmetres de configuració. Pots fer servir el f
 
 ## Run des de terminal
 
-Executa:
+Executa en mode Debug:
 
     flask --debug run
+
+En _config.py_ ***ten activado en true la variable*** DEBUG en el caso que no añadades el --debug en el comando **flask run**
+
+Executa:
+
+    flask run
 
 I obre un navegador a l'adreça: [http://127.0.0.1:5000](http://127.0.0.1:5000).
 
