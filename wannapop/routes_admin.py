@@ -28,6 +28,7 @@ def bad_users():
     block = db.session.query(BlockedUser).all()
     return render_template('admin/blocked_users_list.html', users=users, block=block)
 
+# Bloqueo de usuario
 @admin_bp.route('/users/<user_id>/block', methods=['POST'])
 @role_required(Role.admin)
 def block_user(user_id):
@@ -43,14 +44,24 @@ def block_user(user_id):
         flash("Usuario bloqueado", "success")
         return redirect(url_for('/admin/users'))
     else: # GET
-        return render_template('products/delete.html', form = form, product = product)
-    flash("Usuari bloqueao")
-    return "Usuario bloqueado"  # Puedes retornar un mensaje o código de estado apropiado
+        return render_template('admin/users_list.html', form = form)
 
+# Desbloqueo de usuario
 @admin_bp.route('/users/<user_id>/unblock', methods=['POST'])
 @role_required(Role.admin)
 def unblock_user(user_id):
     # Lógica para desbloquear al usuario
-    flash("Usuari desbloqueao")
-    return "Usuario desbloqueado"
+    user = db.session.query(User).filter(User.id == user_id).one_or_none()
+    if not user:
+        abort(404)
+    form = BlockedUser()
+    if form.validate_on_submit(): # si s'ha fet submit al formulari
+        # insert!
+        db.session.add()
+        db.session.commit()
+        flash("Usuario desbloqueado", "success")
+        return redirect(url_for('/admin/users'))
+    else: # GET
+        return render_template('admin/users_list.html', form = form)
+
 

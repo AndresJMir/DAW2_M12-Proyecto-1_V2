@@ -93,7 +93,7 @@ class Status(db.Model):
     name = db.Column(db.String, nullable=False)
     slug = db.Column(db.String, nullable=False)
 
-
+# Moderacion de usuaris
 class BlockedUser(db.Model):
     __tablename__ = "blocked_users"
     user_id = db.Column(db.Integer, primary_key=True)
