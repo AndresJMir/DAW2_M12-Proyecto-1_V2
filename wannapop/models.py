@@ -43,7 +43,7 @@ class User(UserMixin, db.Model):
     def is_wanner(self):
         return self.role == "wanner"
 
-    def is_action_allowed_to_product(self, action, product = None):
+    def is_action_allowed_to_product(self, action, product = None, banned = None):
         from .helper_role import _permissions, Action
 
         current_permissions = _permissions[self.role]
@@ -53,19 +53,20 @@ class User(UserMixin, db.Model):
         if not action in current_permissions:
             return False
         
-        # Un usuari wanner sols pot modificar el seu propi producte
+        # Un/a usuari/a wanner sols pot modificar el seu propi producte
         if (action == Action.products_update and self.is_wanner()):
-            if not product:
-                return False
-            return self.id == product.seller_id
+            return product and self.id == product.seller_id
         
-        # Un usuari wanner sols pot eliminar el seu propi producte
+        # Un/a usuari/a wanner sols pot eliminar el seu propi producte
         if (action == Action.products_delete and self.is_wanner()):
-            if not product:
-                return False
-            return self.id == product.seller_id
+            return product and self.id == product.seller_id
         
-        # si hem arribat fins aquí, l'usuari té permisos
+        # Un/a usuari/a wanner sols pot veure els productes no prohibits,
+        # exceptuant els seus propis, tot i que hagin estat prohibits
+        if (action == Action.products_read and self.is_wanner()):
+            return product and (not banned or self.id == product.seller_id)
+        
+        # Si hem arribat fins aquí, l'usuari té permisos
         return True
 
 class Product(db.Model):
@@ -93,9 +94,14 @@ class Status(db.Model):
     name = db.Column(db.String, nullable=False)
     slug = db.Column(db.String, nullable=False)
 
-# Moderacion de usuaris
 class BlockedUser(db.Model):
     __tablename__ = "blocked_users"
-    user_id = db.Column(db.Integer, primary_key=True)
-    message = db.Column(db.Text)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), primary_key=True)
+    message = db.Column(db.String, nullable=False)
+    created = db.Column(db.DateTime, server_default=func.now())
+
+class BannedProduct(db.Model):
+    __tablename__ = "banned_products"
+    product_id = db.Column(db.Integer, db.ForeignKey("products.id"), primary_key=True)
+    reason = db.Column(db.String, nullable=False)
     created = db.Column(db.DateTime, server_default=func.now())

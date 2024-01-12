@@ -1,11 +1,10 @@
-from flask import Flask
+from flask import Flask, current_app
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_principal import Principal
-from .helper_mail import MailManager
 from werkzeug.local import LocalProxy
-from flask_debugtoolbar import DebugToolbarExtension        # Importa el Debug Bar
-from flask import current_app
+from flask_debugtoolbar import DebugToolbarExtension
+from .helper_mail import MailManager
 
 # https://stackoverflow.com/a/31764294
 logger = LocalProxy(lambda: current_app.logger)
@@ -14,7 +13,6 @@ db_manager = SQLAlchemy()
 login_manager = LoginManager()
 principal_manager = Principal()
 mail_manager = MailManager()
-
 toolbar = DebugToolbarExtension()   # Mete el Debug Bar
 
 def create_app():

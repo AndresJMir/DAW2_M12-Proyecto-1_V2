@@ -12,19 +12,24 @@ Usuaris
 			<th>NOM</th>
 			<th>EMAIL</th>
 			<th>ROL</th>
-			<th>Accions</th>
+			<th>BLOCKED?</th>
 		</tr>
 	</thead>
 	<tbody>
-		{% for user in users %}
-		<tr>
+		{% for (user, blocked) in users %}
+		<tr class="{{ 'blocked' if blocked }}" alt="wowww">
             <td>{{ user.id }}</td>
             <td>{{ user.name }}</td>
             <td>{{ user.email }}</td>
             <td>{{ user.role }}</td>
-			<td>{% if user_id != user.id %}
-				<a href="users/{{ user.user_id }}/block" alt="Bloquear">Bloquear</a>
-			{% endif %}</td>
+			<td>
+			{% if blocked %}
+				<div><span>🔴</span> <a href="/admin/users/{{ user.id }}/unblock" alt="Unblock">🔄</a></div>
+				<div><small>{{ blocked.message }}</small></div>
+			{% else %}
+				<div><span>🟢</span> <a href="/admin/users/{{ user.id }}/block" alt="Block">🔄</a></div>
+			{% endif %}
+			</td>
 		</tr>
 		{% endfor %}
 	</tbody>

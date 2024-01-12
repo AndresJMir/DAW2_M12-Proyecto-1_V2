@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash
 from flask_login import current_user, login_required, logout_user
 from .forms import ProfileForm
+from .models import BlockedUser
 from . import db_manager as db, mail_manager
 import secrets
 
@@ -57,10 +58,12 @@ def profile():
             
         return redirect(url_for('main_bp.profile'))
     else:
+        blocked = db.session.query(BlockedUser).filter(BlockedUser.user_id == current_user.id).one_or_none()
+
         form.name.data = current_user.name
         form.email.data = current_user.email    
 
-        return render_template('profile.html', form = form)
+        return render_template('profile.html', form = form, blocked = blocked)
 
 @main_bp.app_errorhandler(403)
 def forbidden_access(e):
