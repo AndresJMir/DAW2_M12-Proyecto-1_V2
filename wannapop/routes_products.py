@@ -71,7 +71,7 @@ def product_create():
 def product_read(product_id):
     # select amb join i 1 resultat
     result = db.session.query(Product, Category, Status, BannedProduct).join(Category).join(Status).outerjoin(BannedProduct).filter(Product.id == product_id).one_or_none()
-
+    # result = Product.read(product_id)
     if not result:
         abort(404)
 
@@ -88,15 +88,11 @@ def product_read(product_id):
 @products_bp.route('/products/update/<int:product_id>',methods = ['POST', 'GET'])
 @perm_required(Action.products_update)
 def product_update(product_id):
-    # select amb 1 resultat
-    product = db.session.query(Product).filter(Product.id == product_id).one_or_none()
-    
+    product = Product.get(product_id)    
     if not product:
         abort(404)
-
     if not current_user.is_action_allowed_to_product(Action.products_update, product):
         abort(403)
-
     # selects que retornen una llista de resultats
     categories = db.session.query(Category).order_by(Category.id.asc()).all()
     statuses = db.session.query(Status).order_by(Status.id.asc()).all()
@@ -116,8 +112,7 @@ def product_update(product_id):
             product.photo = filename
 
         # update!
-        db.session.add(product)
-        db.session.commit()
+        Product.update(product)
 
         # https://en.wikipedia.org/wiki/Post/Redirect/Get
         flash("Producte actualitzat", "success")
@@ -129,20 +124,10 @@ def product_update(product_id):
 @perm_required(Action.products_delete)
 def product_delete(product_id):
     # select amb 1 resultat
-    product = db.session.query(Product).filter(Product.id == product_id).one_or_none()
-
-    if not product:
-        abort(404)
-
-    if not current_user.is_action_allowed_to_product(Action.products_delete, product):
-        abort(403)
-
+    product = Product.get(product_id)
     form = ConfirmForm()
-    if form.validate_on_submit(): # si s'ha fet submit al formulari
-        # delete!
-        db.session.delete(product)
-        db.session.commit()
-
+    if form.validate_on_submit():
+        product.delete( )
         flash("Producte esborrat", "success")
         return redirect(url_for('products_bp.product_list'))
     else: # GET
