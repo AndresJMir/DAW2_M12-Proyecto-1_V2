@@ -22,7 +22,9 @@ def templates_processor():
 @perm_required(Action.products_list)
 def product_list():
     # select amb join que retorna una llista de resultats
-    products = db.session.query(Product, Category, BannedProduct).join(Category).outerjoin(BannedProduct).order_by(Product.id.asc()).all()
+    products = Product.get_all_with(Category, BannedProduct)
+    # product = Product.get_with([Product, Category, BannedProduct], BannedProduct)
+    # products = db.session.query(Product, Category, BannedProduct).join(Category).outerjoin(BannedProduct).order_by(Product.id.asc()).all()
 
     return render_template('products/list.html', products = products)
 
@@ -30,12 +32,16 @@ def product_list():
 @perm_required(Action.products_create)
 def product_create(): 
     # usuari bloquejat, no pot crear productes
-    if db.session.query(BlockedUser).filter(BlockedUser.user_id == current_user.id).one_or_none():
+    if BlockedUser.get_filtered_by(user_id = current_user.id):
         abort(403)
+    # if db.session.query(BlockedUser).filter(BlockedUser.user_id == current_user.id).one_or_none():
+    #     abort(403)
 
     # selects que retornen una llista de resultats
-    categories = db.session.query(Category).order_by(Category.id.asc()).all()
-    statuses = db.session.query(Status).order_by(Status.id.asc()).all()
+    categories = Category.get_all()
+    statuses = Status.get_all()
+    # categories = db.session.query(Category).order_by(Category.id.asc()).all()
+    # statuses = db.session.query(Status).order_by(Status.id.asc()).all()
 
     # carrego el formulari amb l'objecte products
     form = ProductForm()
@@ -57,8 +63,9 @@ def product_create():
             new_product.photo = "no_image.png"
 
         # insert!
-        db.session.add(new_product)
-        db.session.commit()
+        Product.save(new_product)
+        # db.session.add(new_product)
+        # db.session.commit()
 
         # https://en.wikipedia.org/wiki/Post/Redirect/Get
         flash("Nou producte creat", "success")
@@ -95,8 +102,10 @@ def product_update(product_id):
     if not current_user.is_action_allowed_to_product(Action.products_update, product):
         abort(403)
     # selects que retornen una llista de resultats
-    categories = db.session.query(Category).order_by(Category.id.asc()).all()
-    statuses = db.session.query(Status).order_by(Status.id.asc()).all()
+    categories = Category.get_all()
+    statuses = Status.get_all()
+    # categories = db.session.query(Category).order_by(Category.id.asc()).all()
+    # statuses = db.session.query(Status).order_by(Status.id.asc()).all()
 
     # carrego el formulari amb l'objecte products
     form = ProductForm(obj = product)
