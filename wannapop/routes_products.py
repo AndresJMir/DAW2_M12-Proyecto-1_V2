@@ -70,7 +70,8 @@ def product_create():
 @perm_required(Action.products_read)
 def product_read(product_id):
     # select amb join i 1 resultat
-    result = db.session.query(Product, Category, Status, BannedProduct).join(Category).join(Status).outerjoin(BannedProduct).filter(Product.id == product_id).one_or_none()
+    #result = db.session.query(Product, Category, Status, BannedProduct).join(Category).join(Status).outerjoin(BannedProduct).filter(Product.id == product_id).one_or_none()
+    result = Product.get_with(product_id, [Category, Status], BannedProduct)
     # result = Product.read(product_id)
     if not result:
         abort(404)

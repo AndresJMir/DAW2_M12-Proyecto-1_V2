@@ -30,28 +30,54 @@ class BaseMixin():
             return False
 
     @classmethod
+    def db_query(cls, *args):
+        return db.session.query(cls, *args)
+
+    # @classmethod
+    # def db_query_with(cls, join_cls):
+    #     return cls.db_query(join_cls).join(join_cls)
+
+    @classmethod
+    def db_query_with(cls, join_cls, outerjoin_cls = []):
+        joins = join_cls if type(join_cls) is list else [join_cls]
+        ojoins = outerjoin_cls if type(outerjoin_cls) is list else [outerjoin_cls]
+        args = tuple(joins + ojoins)
+        query = cls.db_query(*args)
+        for c in joins:
+            query = query.join(c)
+        for c in ojoins:
+            query = query.outerjoin(c)
+        return query
+    
+    @classmethod
     def get(cls, id):
-        return db.session.query(cls).get(id)
+        return cls.db_query().get(id)
     
     @classmethod
     def get_all(cls):
-        return db.session.query(cls).all()
+        return cls.db_query().all()
 
     @classmethod
     def get_filtered_by(cls, **kwargs):
-        return db.session.query(cls).filter_by(**kwargs).one_or_none()
+        return cls.db_query().filter_by(**kwargs).one_or_none()
 
     @classmethod
     def get_all_filtered_by(cls, **kwargs):
-        return db.session.query(cls).filter_by(**kwargs).order_by(cls.id.asc()).all()
+        return cls.db_query().filter_by(**kwargs).order_by(cls.id.asc()).all()
+    
+    @classmethod
+    def get_with(cls, id, join_cls, outerjoin_cls = []):
+        return cls.db_query_with(join_cls, outerjoin_cls).filter(cls.id == id).one_or_none()
 
     @classmethod
-    def get_with(cls, id, join_cls):
-        return db.session.query(cls, join_cls).join(join_cls).filter(cls.id == id).one_or_none()
+    def get_all_with(cls, join_cls, outerjoin_cls = []):
+        return cls.db_query_with(join_cls, outerjoin_cls).order_by(cls.id.asc()).all()
 
-    @classmethod
-    def get_all_with(cls, join_cls):
-        return db.session.query(cls, join_cls).join(join_cls).order_by(cls.id.asc()).all()
+    @staticmethod
+    def db_enable_debug():
+        import logging
+        logging.basicConfig()
+        logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
 from collections import OrderedDict
 from sqlalchemy.engine.row import Row
@@ -79,11 +105,13 @@ class SerializableMixin():
                         # model
                         obj = y.to_dict()
                         first = False
-                    else:
+                    elif y:
                         # relationships
                         key = y.__class__.__name__.lower()
-                        del obj[key + '_id']
                         obj[key] = y.to_dict()
+                        fk = key + '_id'
+                        if fk in obj:
+                            del obj[fk]
                 result.append(obj)
             else:
                 # only model
