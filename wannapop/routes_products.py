@@ -35,7 +35,7 @@ def product_create():
     if BlockedUser.get_filtered_by(user_id = current_user.id):
         abort(403)
     # if db.session.query(BlockedUser).filter(BlockedUser.user_id == current_user.id).one_or_none():
-    #     abort(403)
+    #      abort(403)
 
     # selects que retornen una llista de resultats
     categories = Category.get_all()

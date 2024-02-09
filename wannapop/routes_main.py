@@ -43,7 +43,8 @@ def profile():
             flash("Cap canvi", "success")
         else:
             # guardo els canvis a la bbdd
-            db.session.commit()
+            current_user.update()
+            # db.session.commit()
 
             if not current_user.verified:
                 # envio l'email!
@@ -58,8 +59,8 @@ def profile():
             
         return redirect(url_for('main_bp.profile'))
     else:
-        blocked = db.session.query(BlockedUser).filter(BlockedUser.user_id == current_user.id).one_or_none()
-
+        # blocked = db.session.query(BlockedUser).filter(BlockedUser.user_id == current_user.id).one_or_none()
+        blocked = BlockedUser.get_filtered_by(user_id=current_user.id)
         form.name.data = current_user.name
         form.email.data = current_user.email    
 
