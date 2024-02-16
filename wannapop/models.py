@@ -106,3 +106,16 @@ class BannedProduct(db.Model, BaseMixin, SerializableMixin):
     product_id = db.Column(db.Integer, db.ForeignKey("products.id"), primary_key=True)
     reason = db.Column(db.String, nullable=False)
     created = db.Column(db.DateTime, server_default=func.now())
+
+class Orders(db.Model, BaseMixin, SerializableMixin):
+    __tablename__ = "orders"
+    id = db.Column(db.Integer, primary_key=True)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
+    buyer_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    offer = db.Column(db.Numeric(10, 2))  # Assuming "money" is a numeric type
+    created = db.Column(db.DateTime, server_default=func.now())
+
+class ConfirmedOrders(db.Model, BaseMixin, SerializableMixin):
+    __tablename__ = "confirmed_orders"
+    order_id = db.Column(db.Integer, db.ForeignKey('orders.id'), primary_key=True)
+    created = db.Column(db.DateTime, server_default=func.now())
