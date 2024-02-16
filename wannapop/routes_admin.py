@@ -39,7 +39,7 @@ def block_user(user_id):
 
     form = BlockUserForm()
     if form.validate_on_submit():
-        new_block = BlockedUser();
+        new_block = BlockedUser()
         # carregar dades de la URL
         new_block.user_id = user.id
         # carregar dades del formulari
@@ -86,7 +86,7 @@ def unblock_user(user_id):
 @role_required(Role.moderator)
 def ban_product(product_id):
     # result = db.session.query(Product, BannedProduct).outerjoin(BannedProduct).filter(Product.id == product_id).one_or_none()
-    result = User.get_with(user_id, [], [BannedProduct])
+    result = Product.get_with(product_id, [], [BannedProduct])
     if not result:
         abort(404)
     
@@ -98,7 +98,7 @@ def ban_product(product_id):
 
     form = BanProductForm()
     if form.validate_on_submit():
-        new_banned = BannedProduct();
+        new_banned = BannedProduct()
         # carregar dades de la URL
         new_banned.product_id = product.id
         # carregar dades del formulari
